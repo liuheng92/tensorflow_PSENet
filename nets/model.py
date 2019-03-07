@@ -10,7 +10,7 @@ from nets.resnet import resnet_v1
 
 FLAGS = tf.app.flags.FLAGS
 
-#TODO:使用最近领还是线性插值，文章没有介绍
+#TODO:bilinear or nearest_neighbor?
 def unpool(inputs, rate):
     return tf.image.resize_bilinear(inputs, size=[tf.shape(inputs)[1]*rate,  tf.shape(inputs)[2]*rate])
 
@@ -103,8 +103,6 @@ def model(images, outputs = 6, weight_decay=1e-5, is_training=True):
             S = slim.conv2d(F, outputs, 1)
     up_S = unpool(S, 4)
     seg_S_pred = tf.nn.sigmoid(up_S)
-    shape_res_S = tf.shape(seg_S_pred)
-    logger.debug(shape_res_S)
 
     return seg_S_pred
 

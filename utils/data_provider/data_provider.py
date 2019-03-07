@@ -74,22 +74,6 @@ def load_annoataion(p):
                 text_tags.append(False)
         return np.array(text_polys, dtype=np.float32), np.array(text_tags, dtype=np.bool)
 
-def polygon_area(poly):
-    '''
-    compute area of a polygon
-    if area < 0 then points are clockwise
-    :param poly:
-    :return:
-    '''
-    edge = [
-        (poly[1][0] - poly[0][0]) * (poly[1][1] + poly[0][1]),
-        (poly[2][0] - poly[1][0]) * (poly[2][1] + poly[1][1]),
-        (poly[3][0] - poly[2][0]) * (poly[3][1] + poly[2][1]),
-        (poly[0][0] - poly[3][0]) * (poly[0][1] + poly[3][1])
-    ]
-    return np.sum(edge)/2.
-
-
 def check_and_validate_polys(polys, tags, xxx_todo_changeme):
     '''
     check so that the text poly is in the same direction,
