@@ -186,7 +186,7 @@ def perimeter(poly):
         nums = poly.shape[0]
         for i in range(nums):
             p += abs(np.linalg.norm(poly[i%nums]-poly[(i+1)%nums]))
-        logger.debug('perimeter:{}'.format(p))
+        # logger.debug('perimeter:{}'.format(p))
         return p
     except Exception as e:
         traceback.print_exc()
@@ -207,13 +207,14 @@ def shrink_poly(poly, r):
         traceback.print_exc()
         raise e
 
-def generate_rbox(im_size, polys, tags, image_index, scale_ratio):
+#TODO:filter small text(when shrincked region shape is 0 no matter what scale ratio is)
+def generate_rbox(im_size, polys, tags, image_name, scale_ratio):
     '''
     :param im_size: input image size
     :param polys: input text regions
     :param tags: ignore text regions tags
     :param image_index: for log
-    :param scale_ratio:ground truth scale ratio
+    :param scale_ratio:ground truth scale ratio, default[0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
     :return:
     seg_maps: segmentation results with different scale ratio, save in different channel
     training_mask: ignore text regions
@@ -223,29 +224,33 @@ def generate_rbox(im_size, polys, tags, image_index, scale_ratio):
     seg_maps = np.zeros((h,w,6), dtype=np.uint8)
     # mask used during traning, to ignore some hard areas
     training_mask = np.ones((h, w), dtype=np.uint8)
+    ignore_poly_mark = []
     for i in range(len(scale_ratio)):
         seg_map = np.zeros((h,w), dtype=np.uint8)
         for poly_idx, poly_tag in enumerate(zip(polys, tags)):
             poly = poly_tag[0]
             tag = poly_tag[1]
 
-            # seg map scale_ratio=[0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-            shrinked_poly = shrink_poly(poly.copy(), scale_ratio[i])
-            shrinked_poly = np.array(shrinked_poly)
-            logger.debug(shrinked_poly.shape)
+            # ignore ###
+            if i == 0 and tag:
+                cv2.fillPoly(training_mask, poly.astype(np.int32)[np.newaxis, :, :], 0)
+                ignore_poly_mark.append(poly_idx)
 
-            if not len(shrinked_poly):
-                logger.info("len(shricked_poly) is 0,image %d".format(image_index))
+            # seg map
+            shrinked_polys = []
+            if poly_idx not in ignore_poly_mark:
+                shrinked_polys = shrink_poly(poly.copy(), scale_ratio[i])
+
+            if not len(shrinked_polys) and poly_idx not in ignore_poly_mark:
+                logger.info("before shrink poly area:{} len(shrinked_poly) is 0,image {}".format(
+                    abs(pyclipper.Area(poly)),image_name))
+                # if the poly is too small, then ignore it during training
+                cv2.fillPoly(training_mask, poly.astype(np.int32)[np.newaxis, :, :], 0)
+                ignore_poly_mark.append(poly_idx)
                 continue
-            seg_map = cv2.fillPoly(seg_map, shrinked_poly.astype(np.int32), 1)
+            for shrinked_poly in shrinked_polys:
+                seg_map = cv2.fillPoly(seg_map, [np.array(shrinked_poly).astype(np.int32)], 1)
 
-            # if the poly is too small, then ignore it during training
-            if i==0 and abs(pyclipper.Area(poly)) < FLAGS.min_text_area_size:
-                cv2.fillPoly(training_mask, poly.astype(np.int32)[np.newaxis, :, :], 0)
-            #eleminate ###
-            if i==0 and tag:
-                print('#####')
-                cv2.fillPoly(training_mask, poly.astype(np.int32)[np.newaxis, :, :], 0)
         seg_maps[..., i] = seg_map
     return seg_maps, training_mask
 
@@ -334,7 +339,8 @@ def generator(input_size=512, batch_size=32,
                     text_polys[:, :, 0] *= resize_ratio_3_x
                     text_polys[:, :, 1] *= resize_ratio_3_y
                     new_h, new_w, _ = im.shape
-                    seg_map_per_image, training_mask = generate_rbox((new_h, new_w), text_polys, text_tags, i, scale_ratio)
+                    seg_map_per_image, training_mask = generate_rbox((new_h, new_w), text_polys, text_tags,
+                                                                     image_list[i], scale_ratio)
                     if not len(seg_map_per_image):
                         logger.info("len(seg_map)==0 image: %d " % i)
                         continue
@@ -356,10 +362,13 @@ def generator(input_size=512, batch_size=32,
                     axs[1, 1].imshow(seg_map_per_image[..., 3])
                     axs[1, 1].set_xticks([])
                     axs[1, 1].set_yticks([])
-                    axs[2, 0].imshow(seg_map_per_image[..., 4])
+                    axs[1, 2].imshow(seg_map_per_image[..., 4])
+                    axs[1, 2].set_xticks([])
+                    axs[1, 2].set_yticks([])
+                    axs[2, 0].imshow(seg_map_per_image[..., 5])
                     axs[2, 0].set_xticks([])
                     axs[2, 0].set_yticks([])
-                    axs[2, 1].imshow(seg_map_per_image[..., 5])
+                    axs[2, 1].imshow(training_mask)
                     axs[2, 1].set_xticks([])
                     axs[2, 1].set_yticks([])
                     plt.tight_layout()
