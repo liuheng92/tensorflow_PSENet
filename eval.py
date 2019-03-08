@@ -5,9 +5,7 @@ import os
 import numpy as np
 import tensorflow as tf
 from utils.utils_tool import logger, cfg
-from PIL import Image
 import matplotlib.pyplot as plt
-import pylab
 
 tf.app.flags.DEFINE_string('test_data_path', None, '')
 tf.app.flags.DEFINE_string('gpu_list', '0', '')
@@ -74,15 +72,14 @@ def resize_image(im, max_side_len=1200):
     return im, (ratio_h, ratio_w)
 
 
-def detect(seg_maps, timer, min_area_thresh=10, seg_map_thresh=0.8):
+def detect(seg_maps, timer, min_area_thresh=10, seg_map_thresh=0.9, ratio = 1):
     '''
     restore text boxes from score map and geo map
-    :param score_map:
-    :param geo_map:
+    :param seg_maps:
     :param timer:
-    :param score_map_thresh: threshhold for score map
-    :param box_thresh: threshhold for boxes
-    :param nms_thres: threshold for nms
+    :param min_area_thresh:
+    :param seg_map_thresh: threshhold for seg map
+    :param ratio: compute each seg map thresh
     :return:
     '''
     if len(seg_maps.shape) == 4:
@@ -91,68 +88,62 @@ def detect(seg_maps, timer, min_area_thresh=10, seg_map_thresh=0.8):
     kernals = []
     one = np.ones_like(seg_maps[..., 0], dtype=np.uint8)
     zero = np.zeros_like(seg_maps[..., 0], dtype=np.uint8)
+    thresh = seg_map_thresh
     for i in range(seg_maps.shape[-1]-1, -1, -1):
-        kernal = np.where(seg_maps[..., i]>seg_map_thresh, one, zero)
+        kernal = np.where(seg_maps[..., i]>thresh, one, zero)
         kernals.append(kernal)
+        thresh = seg_map_thresh*ratio
     start = time.time()
-    mask_res = pse(kernals)
+    mask_res, label_values = pse(kernals)
     timer['pse'] = time.time()-start
-    _, contours0, hierarchy = cv2.findContours(mask_res.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     boxes = []
-    for cnt in contours0:
-        if cv2.contourArea(cnt) < min_area_thresh:
-          continue
-        rect = cv2.minAreaRect(cnt)
+    for label_value in label_values:
+        #(y,x)
+        points = np.argwhere(mask_res==label_value)
+        points = points[:, (1,0)]
+        rect = cv2.minAreaRect(points)
         box = cv2.boxPoints(rect)
-        print box
         boxes.append(box)
 
-    return np.array(boxes), timer
+    return np.array(boxes), kernals, timer
 
-def show_score_geo(color_im, seg_maps, im_res):
+def show_score_geo(color_im, kernels, im_res):
     fig = plt.figure()
     cmap = plt.cm.hot
-    seg_maps = seg_maps[0]*255
     #
     ax = fig.add_subplot(241)
-    R = seg_maps[0, :, :, 0]*255
-    im = (R)
+    im = kernels[0]*255
     ax.imshow(im)
 
     ax = fig.add_subplot(242)
-    R = seg_maps[0, :, :, 1]*255
-    im = Image.fromarray(R)
+    im = kernels[1]*255
     ax.imshow(im, cmap)
 
     ax = fig.add_subplot(243)
-    R = seg_maps[0, :, :, 2]
-    im = Image.fromarray(R)
+    im = kernels[2]*255
     ax.imshow(im, cmap)
 
     ax = fig.add_subplot(244)
-    R = seg_maps[0, :, :, 3]
-    im = Image.fromarray(R)
+    im = kernels[3]*255
     ax.imshow(im, cmap)
 
     ax = fig.add_subplot(245)
-    R = seg_maps[0, :, :, 4]
-    im = Image.fromarray(R)
+    im = kernels[4]*255
     ax.imshow(im, cmap)
 
     ax = fig.add_subplot(246)
-    R = seg_maps[0, :, :, 5]*255
-    im = Image.fromarray(R)
+    im = kernels[5]*255
     ax.imshow(im, cmap)
 
     ax = fig.add_subplot(247)
-    im = Image.fromarray(color_im)
+    im = color_im
     ax.imshow(im)
 
     ax = fig.add_subplot(248)
-    im = Image.fromarray( im_res )
+    im = im_res
     ax.imshow(im)
 
-    pylab.show()
+    fig.show()
 
 
 def main(argv=None):
@@ -191,7 +182,7 @@ def main(argv=None):
                 seg_maps = sess.run(seg_maps_pred, feed_dict={input_images: [im_resized]})
                 timer['net'] = time.time() - start
 
-                boxes, timer = detect(seg_maps=seg_maps, timer=timer)
+                boxes, kernels, timer = detect(seg_maps=seg_maps, timer=timer)
                 print('{} : net {:.0f}ms, pse {:.0f}ms'.format(
                     im_fn, timer['net']*1000, timer['pse']*1000))
 
@@ -231,6 +222,6 @@ def main(argv=None):
                 if not FLAGS.no_write_images:
                     img_path = os.path.join(FLAGS.output_dir, os.path.basename(im_fn))
                     cv2.imwrite(img_path, im[:, :, ::-1])
-                # show_score_geo(im_resized, seg_maps, im)
+                # show_score_geo(im_resized, kernels, im)
 if __name__ == '__main__':
     tf.app.run()

@@ -18,7 +18,7 @@ __C.info = logging.INFO
 __C.debug = logging.DEBUG
 
 
-def pse(kernals, min_area=10):
+def pse(kernals, min_area=5):
     '''
     reference https://github.com/whai362/PSENet/issues/15
     :param kernals:
@@ -29,14 +29,17 @@ def pse(kernals, min_area=10):
     pred = np.zeros(kernals[0].shape, dtype='int32')
 
     label_num, label = cv2.connectedComponents(kernals[kernal_num - 1].astype(np.uint8), connectivity=4)
-
+    label_values = []
     for label_idx in range(1, label_num):
         if np.sum(label == label_idx) < min_area:
             label[label == label_idx] = 0
+            continue
+        label_values.append(label_idx)
 
     queue = Queue.Queue(maxsize=0)
     next_queue = Queue.Queue(maxsize=0)
     points = np.array(np.where(label > 0)).transpose((1, 0))
+
 
     for point_idx in range(points.shape[0]):
         x, y = points[point_idx, 0], points[point_idx, 1]
@@ -75,4 +78,4 @@ def pse(kernals, min_area=10):
         #     l = pred[x, y]
         #     queue.put((x, y, l))
 
-    return pred
+    return pred, label_values
