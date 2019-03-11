@@ -4,6 +4,7 @@ import time
 import os
 import numpy as np
 import tensorflow as tf
+from tensorflow.python.client import timeline
 from utils.utils_tool import logger, cfg
 import matplotlib.pyplot as plt
 
@@ -14,7 +15,7 @@ tf.app.flags.DEFINE_string('output_dir', './results/', '')
 tf.app.flags.DEFINE_bool('no_write_images', False, 'do not write images')
 
 from nets import model
-from utils.utils_tool import pse
+from pse import pse
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -33,7 +34,7 @@ def get_images():
                 if filename.endswith(ext):
                     files.append(os.path.join(parent, filename))
                     break
-    print('Find {} images'.format(len(files)))
+    logger.info('Find {} images'.format(len(files)))
     return files
 
 
@@ -96,6 +97,7 @@ def detect(seg_maps, timer, min_area_thresh=10, seg_map_thresh=0.9, ratio = 1):
     start = time.time()
     mask_res, label_values = pse(kernals)
     timer['pse'] = time.time()-start
+    mask_res = np.array(mask_res)
     boxes = []
     for label_value in label_values:
         #(y,x)
@@ -166,7 +168,7 @@ def main(argv=None):
         with tf.Session(config=tf.ConfigProto(allow_soft_placement=True)) as sess:
             ckpt_state = tf.train.get_checkpoint_state(FLAGS.checkpoint_path)
             model_path = os.path.join(FLAGS.checkpoint_path, os.path.basename(ckpt_state.model_checkpoint_path))
-            print('Restore from {}'.format(model_path))
+            logger.info('Restore from {}'.format(model_path))
             saver.restore(sess, model_path)
 
             im_fn_list = get_images()
@@ -177,17 +179,22 @@ def main(argv=None):
                 start_time = time.time()
                 im_resized, (ratio_h, ratio_w) = resize_image(im)
 
+                # options = tf.RunOptions(trace_level = tf.RunOptions.FULL_TRACE)
+                # run_metadata = tf.RunMetadata()
                 timer = {'net': 0, 'pse': 0}
                 start = time.time()
                 seg_maps = sess.run(seg_maps_pred, feed_dict={input_images: [im_resized]})
                 timer['net'] = time.time() - start
+                # fetched_timeline = timeline.Timeline(run_metadata.step_stats)
+                # chrome_trace = fetched_timeline.generate_chrome_trace_format()
+                # with open(os.path.join(FLAGS.output_dir, os.path.basename(im_fn).split('.')[0]+'.json'), 'w') as f:
+                #     f.write(chrome_trace)
 
                 boxes, kernels, timer = detect(seg_maps=seg_maps, timer=timer)
-                print('{} : net {:.0f}ms, pse {:.0f}ms'.format(
+                logger.info('{} : net {:.0f}ms, pse {:.0f}ms'.format(
                     im_fn, timer['net']*1000, timer['pse']*1000))
 
                 if boxes is not None:
-                    print boxes.shape
                     boxes = boxes.reshape((-1, 4, 2))
                     boxes[:, :, 0] /= ratio_w
                     boxes[:, :, 1] /= ratio_h
@@ -196,7 +203,7 @@ def main(argv=None):
                     boxes[:, :, 1] = np.clip(boxes[:, :, 1], 0, h)
 
                 duration = time.time() - start_time
-                print('[timing] {}'.format(duration))
+                logger.info('[timing] {}'.format(duration))
 
                 # save to file
                 if boxes is not None:
