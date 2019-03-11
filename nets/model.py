@@ -46,8 +46,8 @@ def build_feature_pyramid(C, weight_decay):
                                                 stride=1,
                                                 scope='build_P5')
 
-            feature_pyramid['P6'] = slim.max_pool2d(feature_pyramid['P5'],
-                                                    kernel_size=[2, 2], stride=2, scope='build_P6')
+            # feature_pyramid['P6'] = slim.max_pool2d(feature_pyramid['P5'],
+            #                                         kernel_size=[2, 2], stride=2, scope='build_P6')
             # P6 is down sample of P5
 
             for layer in range(4, 1, -1):
