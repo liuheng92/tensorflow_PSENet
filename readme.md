@@ -27,7 +27,8 @@ If you have more than one gpu, you can pass gpu ids to gpu_list(like --gpu_list=
 1. right now , only support icdar2017 data format input, like (116,1179,206,1179,206,1207,116,1207,"###"),
 but you can modify data_provider.py to support polygon format input
 2. Already support polygon shrink by using pyclipper module
-3. this re-implemention is just for fun, but I'll continue to improve this code.
+3. this re-implementation is just for fun, but I'll continue to improve this code.
+4. re-implementation pse algorithm by using c++
 
 ### Test
 run
