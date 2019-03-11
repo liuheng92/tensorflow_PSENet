@@ -26,6 +26,9 @@ def pse(kernals, min_area=5):
     :return:
     '''
     kernal_num = len(kernals)
+    if not kernal_num:
+        logger.error('not kernals!')
+        return np.array([]), []
     pred = np.zeros(kernals[0].shape, dtype='int32')
 
     label_num, label = cv2.connectedComponents(kernals[kernal_num - 1].astype(np.uint8), connectivity=4)
