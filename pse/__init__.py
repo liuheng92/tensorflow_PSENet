@@ -14,7 +14,7 @@ def pse(kernals, min_area=5):
     :param min_area:
     :return:
     '''
-    from pse import pse_cpp
+    from .pse import pse_cpp
     kernal_num = len(kernals)
     if not kernal_num:
         return np.array([]), []

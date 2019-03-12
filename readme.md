@@ -29,6 +29,7 @@ but you can modify data_provider.py to support polygon format input
 2. Already support polygon shrink by using pyclipper module
 3. this re-implementation is just for fun, but I'll continue to improve this code.
 4. re-implementation pse algorithm by using c++
+***(if you use python2, just run it, if python3, please replace python-config with python3-config in makefile)***
 
 ### Test
 run
