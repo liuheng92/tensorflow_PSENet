@@ -7,14 +7,15 @@ Thanks for the author's ([@whai362](https://github.com/whai362)) awesome work!
 
 ### Installation
 1. Any version of tensorflow version > 1.0 should be ok.
+2. python 2 or 3 will be ok.
 
 ### Download
-1. Models trained on ICDAR 2017 (training set) + ICPR 2018 (training set): be avariable
-2. Resnet V1 50 provided by tensorflow slim: [slim resnet v1 50](http://download.tensorflow.org/models/resnet_v1_50_2016_08_28.tar.gz)
+trained on ICDAR 2015 (training set) + ICDAR2017 MLT (training set): be avariable
 
 ### Train
-If you want to train the model, you should provide the dataset path, in the dataset path, a separate gt text file should be provided for each image
-and run
+If you want to train the model, you should provide the dataset path, in the dataset path, a separate gt text file should be provided for each image, and **make sure that gt text and image file have the same names**.
+
+Then run train.py like:
 
 ```
 python train.py --gpu_list=0 --input_size=512 --batch_size_per_gpu=8 --checkpoint_path=./resnet_v1_50_rbox/ \
@@ -32,7 +33,7 @@ but you can modify data_provider.py to support polygon format input
 ***(if you use python2, just run it, if python3, please replace python-config with python3-config in makefile)***
 
 ### Test
-run
+run eval.py like:
 ```
 python eval.py --test_data_path=./tmp/images/ --gpu_list=0 --checkpoint_path=./resnet_v1_50_rbox/ \
 --output_dir=./tmp/
@@ -44,5 +45,12 @@ a text file and result image will be then written to the output path.
 ### Examples
 be avariable
 
+### Reference
+1. http://download.tensorflow.org/models/resnet_v1_50_2016_08_28.tar.gz
+2. https://github.com/CharlesShang/FastMaskRCNN
+3. https://github.com/whai362/PSENet/issues/15
+4. https://github.com/argman/EAST
 
-Please let me know if you encounter any issues(OCR group qq: 785515057).
+Please let me know if you encounter any issues(OCR group qq: 785515057), or you can open an issue.
+
+If this repository helps you，please star it. Thanks.
