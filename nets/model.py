@@ -77,7 +77,7 @@ def model(images, outputs = 6, weight_decay=1e-5, is_training=True):
     feature_pyramid = build_feature_pyramid(end_points, weight_decay=weight_decay)
     #unpool sample P
     P_concat = []
-    for i in range(3, 1, -1):
+    for i in range(3, 0, -1):
         P_concat.append(unpool(feature_pyramid['P'+str(i+2)], 2**i))
     P_concat.append(feature_pyramid['P2'])
     #F = C(P2,P3,P4,P5)

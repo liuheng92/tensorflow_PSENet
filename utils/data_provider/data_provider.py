@@ -192,7 +192,7 @@ def shrink_poly(poly, r):
         raise e
 
 #TODO:filter small text(when shrincked region shape is 0 no matter what scale ratio is)
-def generate_rbox(im_size, polys, tags, image_name, scale_ratio):
+def generate_seg(im_size, polys, tags, image_name, scale_ratio):
     '''
     :param im_size: input image size
     :param polys: input text regions
@@ -323,7 +323,7 @@ def generator(input_size=512, batch_size=32,
                     text_polys[:, :, 0] *= resize_ratio_3_x
                     text_polys[:, :, 1] *= resize_ratio_3_y
                     new_h, new_w, _ = im.shape
-                    seg_map_per_image, training_mask = generate_rbox((new_h, new_w), text_polys, text_tags,
+                    seg_map_per_image, training_mask = generate_seg((new_h, new_w), text_polys, text_tags,
                                                                      image_list[i], scale_ratio)
                     if not len(seg_map_per_image):
                         logger.info("len(seg_map)==0 image: %d " % i)

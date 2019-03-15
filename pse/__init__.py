@@ -20,7 +20,6 @@ def pse(kernals, min_area=5):
         return np.array([]), []
     kernals = np.array(kernals)
     label_num, label = cv2.connectedComponents(kernals[kernal_num - 1].astype(np.uint8), connectivity=4)
-    print label_num
     label_values = []
     for label_idx in range(1, label_num):
         if np.sum(label == label_idx) < min_area:

@@ -54,4 +54,7 @@ be avariable
 ### About issues
 Please let me know if you encounter any issues(OCR group qq: 785515057), or you can open an issue.
 
-If this repository helps you，please star it. Thanks.
+### Acknowledge
+[@rkshuai](https://github.com/rkshuai) found a bug about concat features in model.py.
+
+**If this repository helps you，please star it. Thanks.**
