@@ -10,7 +10,15 @@ Thanks for the author's ([@whai362](https://github.com/whai362)) awesome work!
 2. python 2 or 3 will be ok.
 
 ### Download
-trained on ICDAR 2015 (training set) + ICDAR2017 MLT (training set): be avariable
+trained on ICDAR 2015 (training set) + ICDAR2017 MLT (training set): [baiduyun](https://pan.baidu.com/s/17wvDIS3D_Urdx2zsVmd5Wg)  提取码: 2xum
+
+This model is not as good as article's, it's just a reference.
+You can finetune on it or you can do a lot of optimization based on this code. 
+
+| Database | Precision (%) | Recall (%) | F-measure (%) | 
+| - | - | - | - |
+| ICDAR 2015(val) | 75.06 | 80.40 | 77.64 |
+
 
 ### Train
 If you want to train the model, you should provide the dataset path, in the dataset path, a separate gt text file should be provided for each image, and **make sure that gt text and image file have the same names**.
@@ -41,18 +49,22 @@ python eval.py --test_data_path=./tmp/images/ --gpu_list=0 --checkpoint_path=./r
 
 a text file and result image will be then written to the output path.
 
-
 ### Examples
-be avariable
+![result0](figure/result0.jpg)
+![result1](figure/result1.jpg)
+![result2](figure/result2.jpg)
+![result3](figure/result3.jpg)
+![result4](figure/result4.jpg)
+![result5](figure/result5.jpg)
+
+### About issues
+Please let me know if you encounter any issues(OCR group qq: 785515057), or you can open an issue.
 
 ### Reference
 1. http://download.tensorflow.org/models/resnet_v1_50_2016_08_28.tar.gz
 2. https://github.com/CharlesShang/FastMaskRCNN
 3. https://github.com/whai362/PSENet/issues/15
 4. https://github.com/argman/EAST
-
-### About issues
-Please let me know if you encounter any issues(OCR group qq: 785515057), or you can open an issue.
 
 ### Acknowledge
 [@rkshuai](https://github.com/rkshuai) found a bug about concat features in model.py.
