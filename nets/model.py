@@ -101,8 +101,8 @@ def model(images, outputs = 6, weight_decay=1e-5, is_training=True):
                             weights_regularizer=slim.l2_regularizer(weight_decay),
                             activation_fn=None):
             S = slim.conv2d(F, outputs, 1)
-    up_S = unpool(S, 4)
-    seg_S_pred = tf.nn.sigmoid(up_S)
+
+    seg_S_pred = tf.nn.sigmoid(S)
 
     return seg_S_pred
 

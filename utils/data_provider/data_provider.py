@@ -361,8 +361,8 @@ def generator(input_size=512, batch_size=32,
 
                 images.append(im[..., ::-1].astype(np.float32))
                 image_fns.append(im_fn)
-                seg_maps.append(seg_map_per_image.astype(np.float32))
-                training_masks.append(training_mask[..., np.newaxis].astype(np.float32))
+                seg_maps.append(seg_map_per_image[::4, ::4, :].astype(np.float32))
+                training_masks.append(training_mask[::4, ::4, np.newaxis].astype(np.float32))
 
                 if len(images) == batch_size:
                     yield images, image_fns, seg_maps,  training_masks

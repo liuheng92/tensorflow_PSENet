@@ -73,7 +73,7 @@ def resize_image(im, max_side_len=1200):
     return im, (ratio_h, ratio_w)
 
 
-def detect(seg_maps, timer, min_area_thresh=10, seg_map_thresh=0.9, ratio = 1):
+def detect(seg_maps, timer, image_w, image_h, min_area_thresh=10, seg_map_thresh=0.9, ratio = 1):
     '''
     restore text boxes from score map and geo map
     :param seg_maps:
@@ -95,13 +95,14 @@ def detect(seg_maps, timer, min_area_thresh=10, seg_map_thresh=0.9, ratio = 1):
         kernals.append(kernal)
         thresh = seg_map_thresh*ratio
     start = time.time()
-    mask_res, label_values = pse(kernals)
+    mask_res, label_values = pse(kernals, min_area_thresh)
     timer['pse'] = time.time()-start
     mask_res = np.array(mask_res)
+    mask_res_resized = cv2.resize(mask_res, (w, h), interpolation=cv2.INTER_NEAREST)
     boxes = []
     for label_value in label_values:
         #(y,x)
-        points = np.argwhere(mask_res==label_value)
+        points = np.argwhere(mask_res_resized==label_value)
         points = points[:, (1,0)]
         rect = cv2.minAreaRect(points)
         box = cv2.boxPoints(rect)
@@ -178,7 +179,7 @@ def main(argv=None):
 
                 start_time = time.time()
                 im_resized, (ratio_h, ratio_w) = resize_image(im)
-
+                h, w, _ = im_resized.shape
                 # options = tf.RunOptions(trace_level = tf.RunOptions.FULL_TRACE)
                 # run_metadata = tf.RunMetadata()
                 timer = {'net': 0, 'pse': 0}
@@ -190,7 +191,7 @@ def main(argv=None):
                 # with open(os.path.join(FLAGS.output_dir, os.path.basename(im_fn).split('.')[0]+'.json'), 'w') as f:
                 #     f.write(chrome_trace)
 
-                boxes, kernels, timer = detect(seg_maps=seg_maps, timer=timer)
+                boxes, kernels, timer = detect(seg_maps=seg_maps, timer=timer, image_w=w, image_h=h)
                 logger.info('{} : net {:.0f}ms, pse {:.0f}ms'.format(
                     im_fn, timer['net']*1000, timer['pse']*1000))
 
