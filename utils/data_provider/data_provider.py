@@ -13,7 +13,7 @@ from utils.data_provider.data_util import GeneratorEnqueuer
 import tensorflow as tf
 import pyclipper
 
-tf.app.flags.DEFINE_string('training_data_path', '/Users/liuheng/weibo/python_project/tensorflow_PSENet/ArT-gt-example',
+tf.app.flags.DEFINE_string('training_data_path', None,
                            'training dataset to use')
 tf.app.flags.DEFINE_integer('max_image_large_side', 1280,
                             'max image size of training')
@@ -361,8 +361,8 @@ def generator(input_size=512, batch_size=32,
 
                 images.append(im[..., ::-1].astype(np.float32))
                 image_fns.append(im_fn)
-                seg_maps.append(seg_map_per_image.astype(np.float32))
-                training_masks.append(training_mask[..., np.newaxis].astype(np.float32))
+                seg_maps.append(seg_map_per_image[::4, ::4, :].astype(np.float32))
+                training_masks.append(training_mask[::4, ::4, np.newaxis].astype(np.float32))
 
                 if len(images) == batch_size:
                     yield images, image_fns, seg_maps,  training_masks
