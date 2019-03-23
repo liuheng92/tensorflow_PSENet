@@ -98,7 +98,7 @@ def detect(seg_maps, timer, image_w, image_h, min_area_thresh=10, seg_map_thresh
     mask_res, label_values = pse(kernals, min_area_thresh)
     timer['pse'] = time.time()-start
     mask_res = np.array(mask_res)
-    mask_res_resized = cv2.resize(mask_res, (w, h), interpolation=cv2.INTER_NEAREST)
+    mask_res_resized = cv2.resize(mask_res, (image_w, image_h), interpolation=cv2.INTER_NEAREST)
     boxes = []
     for label_value in label_values:
         #(y,x)
