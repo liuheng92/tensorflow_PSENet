@@ -13,7 +13,7 @@ from utils.data_provider.data_util import GeneratorEnqueuer
 import tensorflow as tf
 import pyclipper
 
-tf.app.flags.DEFINE_string('training_data_path', '/Users/liuheng/weibo/python_project/tensorflow_PSENet/ArT-gt-example',
+tf.app.flags.DEFINE_string('training_data_path', None,
                            'training dataset to use')
 tf.app.flags.DEFINE_integer('max_image_large_side', 1280,
                             'max image size of training')
