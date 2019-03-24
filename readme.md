@@ -10,14 +10,14 @@ Thanks for the author's ([@whai362](https://github.com/whai362)) awesome work!
 2. python 2 or 3 will be ok.
 
 ### Download
-trained on ICDAR 2015 (training set) + ICDAR2017 MLT (training set): [baiduyun](https://pan.baidu.com/s/17wvDIS3D_Urdx2zsVmd5Wg)  提取码: 2xum
+trained on ICDAR 2015 (training set) + ICDAR2017 MLT (training set): [baiduyun](https://pan.baidu.com/s/14tQHf9MjuD0lSmwkoZhnCg)  extract code: pffd
 
 This model is not as good as article's, it's just a reference.
 You can finetune on it or you can do a lot of optimization based on this code. 
 
 | Database | Precision (%) | Recall (%) | F-measure (%) | 
 | - | - | - | - |
-| ICDAR 2015(val) | 75.06 | 80.40 | 77.64 |
+| ICDAR 2015(val) | 74.61 | 80.93 | 77.64 |
 
 
 ### Train
