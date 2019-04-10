@@ -10,7 +10,11 @@ Thanks for the author's ([@whai362](https://github.com/whai362)) awesome work!
 2. python 2 or 3 will be ok.
 
 ### Download
-trained on ICDAR 2015 (training set) + ICDAR2017 MLT (training set): [baiduyun](https://pan.baidu.com/s/14tQHf9MjuD0lSmwkoZhnCg)  extract code: pffd
+trained on ICDAR 2015 (training set) + ICDAR2017 MLT (training set): 
+
+[baiduyun](https://pan.baidu.com/s/14tQHf9MjuD0lSmwkoZhnCg)  extract code: pffd
+
+[google drive](https://drive.google.com/file/d/1TjJvtwMp8hJXQhn6Yz2lbPdvBGH-ZQ8u/view?usp=sharing)
 
 This model is not as good as article's, it's just a reference.
 You can finetune on it or you can do a lot of optimization based on this code. 
