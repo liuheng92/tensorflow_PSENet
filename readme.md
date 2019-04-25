@@ -62,7 +62,7 @@ a text file and result image will be then written to the output path.
 ![result5](figure/result5.jpg)
 
 ### About issues
-Please let me know if you encounter any issues(OCR group qq: 785515057), or you can open an issue.
+Please let me know if you encounter any issues check issues first, or you can open an issue.
 
 ### Reference
 1. http://download.tensorflow.org/models/resnet_v1_50_2016_08_28.tar.gz
