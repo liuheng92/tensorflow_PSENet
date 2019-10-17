@@ -75,6 +75,7 @@ namespace pse{
                         continue;
                     q.push(std::make_tuple(index_y, index_x, l));
                     res[index_y][index_x]=l;
+                    is_edge = false;
                 }
                 if (is_edge){
                     next_q.push(std::make_tuple(y, x, l));
